@@ -1,0 +1,15 @@
+---
+# tasks file for ricsanfre.lvm
+
+- name: Ensure lvm packages are installed
+  package:
+    name: '{{ lvm_package_list | list }}'
+    state: 'present'
+    update_cache: true
+  register: pkg_install_result
+  until: pkg_install_result is success
+
+- include_tasks: manage_lvm.yml
+  when:
+    - lvm_groups is defined
+    - manage_lvm|bool
