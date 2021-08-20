@@ -1,0 +1,45 @@
+---
+- hosts: iscsi-server
+  remote_user: ansible
+  become: true
+  vars:
+
+  - lvm_groups:
+      - vgname: vg-iscsi
+        disks:
+          - /dev/sdb
+        create: true
+        lvnames:
+          - lvname: lv_iscsi_node1_1
+            size: 4g
+            opts: ''
+            create: true
+            format: false
+          - lvname: lv_iscsi_node2_1
+            size: 4g
+            create: true
+            format: false
+          - lvname: lv_iscsi_node3_1
+            size: 4g
+            create: true
+            format: false
+          - lvname: lv_iscsi_node3_1
+            size: 4g
+            create: true
+            format: false
+      - vgname: vg-data
+        disks:
+          - /dev/sdc
+        create: true
+        lvnames:
+          - lvname: lv_data
+            size: '100%FREE'
+            create: true
+            format: true
+            filesystem: ext4
+            mount: true
+            mntp: /data
+
+
+  roles:
+    - ricsanfre.lvm
