@@ -1,45 +1,59 @@
 ---
-- hosts: iscsi-server
+- hosts: storage-server
   remote_user: ansible
   become: true
   vars:
-
-  - lvm_groups:
-      - vgname: vg-iscsi
-        disks:
-          - /dev/sdb
-        create: true
-        lvnames:
-          - lvname: lv_iscsi_node1_1
-            size: 4g
-            opts: ''
-            create: true
-            format: false
-          - lvname: lv_iscsi_node2_1
-            size: 4g
-            create: true
-            format: false
-          - lvname: lv_iscsi_node3_1
-            size: 4g
-            create: true
-            format: false
-          - lvname: lv_iscsi_node3_1
-            size: 4g
-            create: true
-            format: false
-      - vgname: vg-data
-        disks:
-          - /dev/sdc
-        create: true
-        lvnames:
-          - lvname: lv_data
-            size: '100%FREE'
-            create: true
-            format: true
-            filesystem: ext4
-            mount: true
-            mntp: /data
-
-
+    storage_partitions:
+      - name: /dev/sdb
+        number: 1
+        part_end: 250MB
+      - name: /dev/sdb
+        number: 2
+        flags:
+          - lvm
+        part_start: 250MB
+        part_end: 2GiB  
+      - name: /dev/sdb
+        number: 3
+        flags:
+          - lvm
+        part_start: 2GiB
+        part_end: 100%
+    storage_volumegroups:
+      - name: vg_local
+        devices:
+          - /dev/sdb2
+      - name: vg_iscsi
+        devices:
+          - /dev/sdb3
+    storage_volumes:
+      - name: vg_iscsi_lv_node1
+        vg: vg_iscsi
+        size: 500
+      - name: vg_iscsi_lv_node2
+        vg: vg_iscsi
+        size: 500
+      - name: vg_iscsi_lv_node3
+        vg: vg_iscsi
+        size: 500
+      - name: vg_iscsi_lv_node4
+        vg: vg_iscsi
+        size: 500
+      - name: vg_local_lv_data
+        vg: vg_local
+        size: 1024
+    storage_filesystems:
+      - name: /dev/vg_local/vg_local_lv_data
+        filesystem: ext4
+    storage_mounts:
+      - name: /data
+        src: /dev/vg_local/vg_local_lv_data
+        owner: root
+        group: root
+        mode: "0755"
+        opts: defaults
+        boot: yes
+        dump: 0
+        passno: 2
   roles:
-    - ricsanfre.lvm
+    - ricsanfre.storage

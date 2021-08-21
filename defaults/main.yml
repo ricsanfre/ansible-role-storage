@@ -1,73 +1,47 @@
 ---
-# defaults file for ricsanfre.lvm
+# defaults file for storage
 
-lvm_package_list:
-  - lvm2
-  - sg3-utils
+storage_default_fstype: ext4
 
-manage_lvm: true
+# storage_partitions:
+#   - name: /dev/sdb
+#     number: 1
+#     part_end: 4GiB
+#   - name: /dev/sdb
+#     number: 2
+#     flags:
+#       - lvm
+#     part_start: 4GiB
+#     part_end: 8GiB
 
+# The `size` is the physical extend size.
+# storage_volumegroups:
+#   - name: group1
+#     devices:
+#       - /dev/sdb2
+#     size: 8
+#   - name: group2
+#     devices:
+#       - /dev/sdb2
+#     size: 128M
 
-lvm_groups: []
-# - vgname: ubuntu-vg
-#   disks:
-#     - /dev/sda5
-#     - /dev/sdc
-#     - /dev/sdd
-#   # defines if VG should exist or be removed
-#   # true or false
-#   create: true
-#   lvnames:
-#     - lvname: swap_1
-#       # Define size of lvol
-#       # 100%FREE, 10g, 1024 (megabytes by default)
-#       size: 5g
-#       # Defines additional lvcreate options (e.g. stripes, stripesize, etc)
-#       opts: ''
-#       # Defines if lvol should exist or be removed
-#       # true or false
-#       create: true
-#       # Defines whether to format the filesystem or not
-#       format: true
-#       # Defines filesystem to format lvol as
-#       filesystem: swap
-#       # Defines if filesystem should be mounted
-#       mount: false
-#       # Defines mountpoint for lvol
-#       mntp: []
-#       # Defines additional mount options (e.g. noatime, noexec, etc)
-#       mopts: ''
-#     - lvname: root
-#       size: 40g
-#       create: true
-#       format: true
-#       filesystem: ext4
-#       mount: true
-#       mntp: /
-# - vgname: test-vg
-#   disks:
-#     - /dev/sdb
-#   create: true
-#   lvnames:
-#     - lvname: test_1
-#       size: 5g
-#       create: true
-#       format: true
-#       filesystem: ext4
-#       mount: true
-#       mntp: /mnt/test_1
-#     - lvname: test_2
-#       size: 10g
-#       create: true
-#       filesystem: ext4
-#       mount: true
-#       mntp: /mnt/test_2
-# - vgname: cinder-volumes
-#   disks:
-#     - /dev/cciss/c0d1
-#   create: true
-#   lvnames:
-#   # Set to None to only create LVM VG w/out creating LVM LVOLS
-#    - None
+# Sizes in megabytes.
+# storage_volumes:
+#   - name: var1
+#     vg: group1
+#     size: 16
 
-pvresize_to_max: false
+# storage_filesystems:
+#   - name: /dev/group1/var
+#     filesystem: ext4
+
+# storage_mounts:
+#   - name: /var
+#     src: /dev/group1/var1
+#     owner: root
+#     group: root
+#     mode: "0755"
+#     opts: defaults
+#     boot: yes
+#     dump: 0
+#     passno: 2

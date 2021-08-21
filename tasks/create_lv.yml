@@ -1,35 +1,15 @@
 ---
 
-- name: create_lv | Display Volume Group
-  debug:
-    var: vg
-    verbosity: 2
+- name: test volume
+  assert:
+    that:
+      - volume.name is defined
+      - volume.vg is defined
+      - volume.size is defined
+    quiet: true
 
-- name: create_lv | creating new LVM logical volume(s)
+- name: create logical volume
   lvol:
-    vg: "{{ vg.vgname }}"
-    lv: "{{ lv.lvname }}"
-    size: "{{ lv.size }}"
-    shrink: false
-    opts: "{{ lv.opts | default('') }}"
-    state: present
-  become: true
-  register: lvchanged
-  when:
-    - vg.create is defined
-    - vg.create|bool
-    - lv is defined
-    - lv != 'None'
-    - lv.create is defined
-    - lv.create|bool
-
-- name: create_lv | debug changed attribute
-  debug:
-    var: lvchanged
-
-# Create filesystem
-- name: create_lv | configuring FS
-  include_tasks: create_fs.yml
-  when:
-    - lv.format is defined
-    - lv.format|bool
+    lv: "{{ volume.name }}"
+    vg: "{{ volume.vg }}"
+    size: "{{ volume.size }}"

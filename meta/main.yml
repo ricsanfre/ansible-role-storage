@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  role_name: lvm
+  role_name: storage
   author: ricsanfre
-  description: Manage LVM role
+  description: Manage storage role
 
   license: license (MIT)
 
@@ -19,5 +19,6 @@ galaxy_info:
     - system
     - disk
     - lvm
+    - parted
 
 dependencies: []

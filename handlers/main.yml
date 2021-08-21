@@ -1,0 +1,9 @@
+---
+# handlers file for storage
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: refresh facts
+  setup:

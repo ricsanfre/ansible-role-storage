@@ -1,15 +1,52 @@
 ---
 # tasks file for ricsanfre.lvm
 
-- name: Ensure lvm packages are installed
+- name: ensure storage packages are installed
   package:
-    name: '{{ lvm_package_list | list }}'
-    state: 'present'
-    update_cache: true
-  register: pkg_install_result
-  until: pkg_install_result is success
+    name: "{{ storage_packages }}"
+    state: present
 
-- include_tasks: manage_lvm.yml
+- name: create partition
+  include_tasks:
+    file: create_partition.yml
+  loop: "{{ storage_partitions }}"
+  loop_control:
+    loop_var: partition
   when:
-    - lvm_groups is defined
-    - manage_lvm|bool
+    - storage_partitions is defined
+
+- name: create LVM volumegroup
+  include_tasks:
+    file: create_vg.yml
+  loop: "{{ storage_volumegroups }}"
+  loop_control:
+    loop_var: volumegroup
+  when:
+    - storage_volumegroups is defined
+
+- name: create LVM logical volume
+  include_tasks:
+    file: create_lv.yml
+  loop: "{{ storage_volumes }}"
+  loop_control:
+    loop_var: volume
+  when:
+    - storage_volumes is defined
+
+- name: create filesystem
+  include_tasks:
+    file: create_fs.yml
+  loop: "{{ storage_filesystems }}"
+  loop_control:
+    loop_var: filesystem
+  when:
+    - storage_filesystems is defined
+
+- name: Mount filesystem
+  include_tasks:
+    file: mount.yml
+  loop: "{{ storage_mounts }}"
+  loop_control:
+    loop_var: mount
+  when:
+    - storage_mounts is defined
