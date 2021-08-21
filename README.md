@@ -1,38 +1,154 @@
-Role Name
+Ansible Role: Storage
 =========
 
-A brief description of the role goes here.
+Role for configure storage on Linux system (manage partitions, LVM volumes groups and logica volumes, filesystems and mount points) on Linux.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Available variables are listed below along with default values (see `defaults\main.yaml`)
+
+
+Set default filesystem to be used
+
+```yml
+storage_default_fstype: ext4
+```
+
+Partitions to be created:
+
+```yml
+storage_partitions:
+  - name: /dev/sdb
+    number: 1
+    part_end: 4GiB
+  - name: /dev/sdb
+    number: 2
+    flags:
+      - lvm
+    part_start: 4GiB
+    part_end: 8GiB
+```
+LVM volumen groups to be created
+
+```yml
+storage_volumegroups:
+  - name: group1
+    devices:
+      - /dev/sdb2
+  - name: group2
+    devices:
+      - /dev/sdb2
+```
+LVM logical volumes to be created
+
+```yml
+storage_volumes:
+  - name: var1
+    vg: group1
+    size: 16
+
+storage_filesystems:
+  - name: /dev/group1/var
+    filesystem: ext4
+```
+
+Mount points to be created
+
+```yml
+storage_mounts:
+  - name: /var
+    src: /dev/group1/var1
+    owner: root
+    group: root
+    mode: "0755"
+    opts: defaults
+    boot: yes
+    dump: 0
+    passno: 2
+
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
+```yml
+---
+- hosts: storage-server
+  remote_user: ansible
+  become: true
+  vars:
+    storage_partitions:
+      - name: /dev/sdb
+        number: 1
+        part_end: 250MB
+      - name: /dev/sdb
+        number: 2
+        flags:
+          - lvm
+        part_start: 250MB
+        part_end: 2GiB  
+      - name: /dev/sdb
+        number: 3
+        flags:
+          - lvm
+        part_start: 2GiB
+        part_end: 100%
+    storage_volumegroups:
+      - name: vg_local
+        devices:
+          - /dev/sdb2
+      - name: vg_iscsi
+        devices:
+          - /dev/sdb3
+    storage_volumes:
+      - name: vg_iscsi_lv_node1
+        vg: vg_iscsi
+        size: 500
+      - name: vg_iscsi_lv_node2
+        vg: vg_iscsi
+        size: 500
+      - name: vg_iscsi_lv_node3
+        vg: vg_iscsi
+        size: 500
+      - name: vg_iscsi_lv_node4
+        vg: vg_iscsi
+        size: 500
+      - name: vg_local_lv_data
+        vg: vg_local
+        size: 1024
+    storage_filesystems:
+      - name: /dev/vg_local/vg_local_lv_data
+        filesystem: ext4
+    storage_mounts:
+      - name: /data
+        src: /dev/vg_local/vg_local_lv_data
+        owner: root
+        group: root
+        mode: "0755"
+        opts: defaults
+        boot: yes
+        dump: 0
+        passno: 2
+  roles:
+    - ricsanfre.storage
+```
 License
 -------
 
-BSD
+MIT/BSD
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Ricardo Sanchez (ricsanfre)
