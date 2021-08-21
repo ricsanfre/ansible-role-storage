@@ -1,0 +1,24 @@
+---
+dependency:
+  name: galaxy
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+platforms:
+  - name: ubuntu
+    box: generic/ubuntu2004
+    cpu: 1
+    memory: 512
+    provider_raw_config_args:
+      - "storage :file, :size => '1G', :device => 'vdb'"
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+verifier:
+  name: ansible

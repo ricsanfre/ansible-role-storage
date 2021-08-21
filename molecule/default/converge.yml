@@ -1,0 +1,60 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    storage_partitions:
+      - name: /dev/vdb
+        number: 1
+        part_end: 100MB
+      - name: /dev/vdb
+        number: 2
+        flags:
+          - lvm
+        part_start: 100MB
+        part_end: 300MB
+      - name: /dev/vdb
+        number: 3
+        flags:
+          - lvm
+        part_start: 300MB
+        part_end: 100%
+    storage_volumegroups:
+      - name: vg_local
+        devices:
+          - /dev/vdb2
+      - name: vg_iscsi
+        devices:
+          - /dev/vdb3
+    storage_volumes:
+      - name: vg_iscsi_lv_node1
+        vg: vg_iscsi
+        size: 100
+      - name: vg_iscsi_lv_node2
+        vg: vg_iscsi
+        size: 100
+      - name: vg_iscsi_lv_node3
+        vg: vg_iscsi
+        size: 100
+      - name: vg_iscsi_lv_node4
+        vg: vg_iscsi
+        size: 100
+      - name: vg_local_lv_data
+        vg: vg_local
+        size: 100
+    storage_filesystems:
+      - name: /dev/vg_local/vg_local_lv_data
+        filesystem: ext4
+    storage_mounts:
+      - name: /data
+        src: /dev/vg_local/vg_local_lv_data
+        owner: root
+        group: root
+        mode: "0755"
+        opts: defaults
+        boot: true
+        dump: 0
+        passno: 2
+  roles:
+    - ricsanfre.storage
