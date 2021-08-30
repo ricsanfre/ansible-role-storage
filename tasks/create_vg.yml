@@ -10,5 +10,5 @@
 - name: create volume groups
   lvg:
     vg: "{{ volumegroup.name }}"
-    pvs: "{{ volumegroup.devices | join(', ') }}"
+    pvs: "{{ volumegroup.devices | join(',') }}"
     pesize: "{{ volumegroup.size | default(omit) }}"
